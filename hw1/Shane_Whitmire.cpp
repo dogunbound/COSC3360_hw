@@ -6,7 +6,45 @@
 #include <set>
 #include <cmath>
 #include <sstream>
-#include <boost/algorithm/string.hpp>
+#include <cctype>
+#include <locale>
+#include <unistd.h>
+#include <list>
+
+
+// https://stackoverflow.com/questions/216823/how-to-trim-a-stdstring
+std::string trim(const std::string &s)
+{
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && isspace(*it))
+        it++;
+
+    std::string::const_reverse_iterator rit = s.rbegin();
+    while (rit.base() != it && isspace(*rit))
+        rit++;
+
+    return std::string(it, rit.base());
+}
+
+// https://stackoverflow.com/questions/275404/splitting-strings-in-c
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while(std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+// https://stackoverflow.com/questions/2896600/how-to-replace-all-occurrences-of-a-character-in-string
+std::string ReplaceAll(std::string &str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    return str;
+}
 
 
 
@@ -22,10 +60,10 @@ std::vector<std::vector<bool>> readFileTo2DMatrix(std::string fileName) {
   while(std::getline(infile, line)) {
     m.push_back(std::vector<bool>());
     std::vector<std::string> splitStr;
-    boost::split(splitStr, line, boost::is_any_of(" "));
+    splitStr = split(line, ' ', splitStr);
 
     for (auto i : splitStr) {
-      boost::trim(i);
+      i = trim(i);
       if (i == "1" || i == "0") {
         m.back().push_back(i == "1");
       }
@@ -36,8 +74,6 @@ std::vector<std::vector<bool>> readFileTo2DMatrix(std::string fileName) {
 }
 
 std::list<std::string> readFileToList(std::string fileName) {
-  std::set<char> delimitters = std::set<char>();
-  delimitters.insert(',');
   std::list<std::string> v = std::list<std::string>();
 
   std::ifstream infile(fileName);
@@ -45,10 +81,10 @@ std::list<std::string> readFileToList(std::string fileName) {
 
   while(std::getline(infile, line)) {
     std::vector<std::string> splitStr;
-    boost::split(splitStr, line, boost::is_any_of(delimitters));
+    splitStr = split(line, ',', splitStr);
 
     for (auto i : splitStr) {
-      boost::trim(i);
+      i = trim(i);
       v.push_back(i);
     }
   }
@@ -109,7 +145,7 @@ std::string convertAllNumbersInWordToWords(const std::string &str) {
 
     /* Checking the given word is integer or not */
     if (std::stringstream(temp) >> found) {
-      boost::replace_all(result, std::to_string(found), convertSmallIntToWord(found));
+      ReplaceAll(result, std::to_string(found), convertSmallIntToWord(found));
     }
 
     /* To save from space at the end of string */
@@ -208,27 +244,22 @@ std::string combineItems(const std::list<std::string> &items) {
   std::string result = "";
   if (items.size() == 1) return items.back();
 
-
-  std::set<char> delimitters;
-  delimitters.insert(',');
   std::list<std::string> itemsReordered;
-
   for (const auto &i : items) {
     std::vector<std::string> splitStr;
-    boost::split(splitStr, i, boost::is_any_of(delimitters));
+    splitStr = split(i, ',', splitStr);
+
     for (auto &j : splitStr) {
-      boost::trim(j);
+      j = trim(j);
       itemsReordered.push_back(j);
     }
   }
 
   std::set<ItemCount> itemCount;
-
-  delimitters = std::set<char>();
-  delimitters.insert(' ');
   for (const auto &i : itemsReordered) {
     std::vector<std::string> splitStr;
-    boost::split(splitStr, i, boost::is_any_of(delimitters));
+    splitStr = split(i, ' ', splitStr);
+
 
     splitStr.back() = removeEverythingAfterNonAlphaNumericCharacter(splitStr.back());
     
@@ -244,8 +275,8 @@ std::string combineItems(const std::list<std::string> &items) {
         itemCountIterator->count++;
       }
     } else {
-      boost::trim(splitStr[0]);
-      boost::trim(splitStr[1]);
+      splitStr[0] = trim(splitStr[0]);
+      splitStr[1] = trim(splitStr[1]);
 
       ItemCount tmp = { 
         std::stoi(splitStr[0]),
