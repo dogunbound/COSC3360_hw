@@ -1,0 +1,25 @@
+2
+2
+3 3
+2 3
+2 2
+process_1:
+15
+7
+request(2,0);
+use_resources(1);
+request(0,3);
+use_resources(2);
+release(2,3);
+print_resources_used; 
+end.
+process_2:
+20
+7
+request(0,2);
+use_resources(1);
+request(2,0);
+use_resources(2);
+release(2,2);
+print_resources_used; 
+end.

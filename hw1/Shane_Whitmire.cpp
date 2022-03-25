@@ -98,32 +98,33 @@ void clearCharArrayWithNULChar(char *arr, unsigned int len) {
   }
 }
 
-std::string convertSmallIntToWord(int num) {
-  std::string result = "";
-  if (num > 99) {
-    std::cout << num << " is greater than 99. Cannot convert\n";
-    return result;
-  }
-  if (num < 0) {
-    std::cout << num << " is less than 0. Cannot convert\n";
-    return result;
-  }
+// https://stackoverflow.com/questions/40252753/c-converting-number-to-words
+std::string digitName(int digit);
+std::string teenName(int number);
+std::string tensName(int number);
+std::string intName(int number);
 
-  const std::string singles[10] = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
-  const std::string teens[10] = { "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" };
-  const std::string tens[8] = { "twenty", "thrity", "fourty", "fifty", "sixty", "seventy", "eighty", "ninety" };
+std::vector<std::string> ones {"","one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+std::vector<std::string> teens {"ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen","sixteen", "seventeen", "eighteen", "nineteen"};
+std::vector<std::string> tens {"", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"};
 
-  if (num < 10) {
-    result = singles[num];
-  } else if (num < 20) {
-    result = teens[num - 10];
-  } else {
-    int tensPlace = std::floor(num / 10) - 2;
-    int singlesPlace = num % 10;
-    result = tens[tensPlace] + "-" + singles[singlesPlace];
+std::string nameForNumber (long number) {
+  if (number < 10) {
+    return ones[number];
+  } else if (number < 20) {
+    return teens [number - 10];
+  } else if (number < 100) {
+    return tens[number / 10] + ((number % 10 != 0) ? " " + nameForNumber(number % 10) : "");
+  } else if (number < 1000) {
+    return nameForNumber(number / 100) + " hundred" + ((number % 100 != 0) ? " " + nameForNumber(number % 100) : "");
+  } else if (number < 1000000) {
+    return nameForNumber(number / 1000) + " thousand" + ((number % 1000 != 0) ? " " + nameForNumber(number % 1000) : "");
+  } else if (number < 1000000000) {
+    return nameForNumber(number / 1000000) + " million" + ((number % 1000000 != 0) ? " " + nameForNumber(number % 1000000) : "");
+  } else if (number < 1000000000000) {
+    return nameForNumber(number / 1000000000) + " billion" + ((number % 1000000000 != 0) ? " " + nameForNumber(number % 1000000000) : "");
   }
-
-  return result;
+  return "error";
 }
 
 //https://www.geeksforgeeks.org/extract-integers-string-c/
@@ -145,7 +146,7 @@ std::string convertAllNumbersInWordToWords(const std::string &str) {
 
     /* Checking the given word is integer or not */
     if (std::stringstream(temp) >> found) {
-      ReplaceAll(result, std::to_string(found), convertSmallIntToWord(found));
+      ReplaceAll(result, std::to_string(found), nameForNumber(found));
     }
 
     /* To save from space at the end of string */

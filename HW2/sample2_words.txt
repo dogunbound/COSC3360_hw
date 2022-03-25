@@ -1,0 +1,2 @@
+R1: Game: Doom, Dune, Dark_Souls
+R2: Platform: PC, PS4, Xbox
