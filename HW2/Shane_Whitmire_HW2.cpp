@@ -10,6 +10,7 @@
 namespace helperFunctions {
   std::string trim(const std::string &s)
   {
+    if (s.empty()) return s;
     std::string::const_iterator it = s.begin();
     while (it != s.end() && isspace(*it))
       it++;
@@ -64,14 +65,18 @@ std::vector<std::vector<std::string>> getResourcesAsMatrix(const std::vector<std
 }
 
 struct ProcessState {
-  const unsigned int deadline;
-  const unsigned int computationTime;
+  unsigned int deadline;
+  unsigned int computationTime;
   std::string *queue;
 };
 
-ProcessState initProcessState(const std::vector<std::string> &processInfo) {
-  ProcessState pState = {
+ProcessState initProcessState(const std::list<std::string> &processInfo) {
+  for (std::string i : processInfo) {
+    i = trim(i);
+    std::cout << i << "\n";
+  }
 
+  ProcessState pState = {
   };
 
   return pState;
@@ -103,11 +108,12 @@ void printState(State state) {
 State initState(const std::vector<std::string> &instructions) {
   std::string line;
   std::list<std::string> instructionList(instructions.begin(), instructions.end());
+  // pop instructionList until nonEmpty line is displayed
   auto popInstructionListUntilNonEmptyLine = [](std::string &line, std::list<std::string> &instructionList) {
     do {
       line = trim(instructionList.front());
       instructionList.pop_front();
-    } while(line.empty());
+    } while(line.empty() && instructionList.size() != 0);
   };
 
   // get number of resources and processes
@@ -116,7 +122,6 @@ State initState(const std::vector<std::string> &instructions) {
   const unsigned int numOfProcesses = std::stoi(instructionList.front());
   popInstructionListUntilNonEmptyLine(line, instructionList);
 
-  // pop instructionList until nonEmpty line is displayed
   popInstructionListUntilNonEmptyLine(line, instructionList);
 
   // Find available list
@@ -129,10 +134,9 @@ State initState(const std::vector<std::string> &instructions) {
   unsigned int *available = new unsigned int[numOfResources];
   std::copy(availableList.begin(), availableList.end(), available);
 
-  // pop instructionList until nonEmpty line is displayed
   popInstructionListUntilNonEmptyLine(line, instructionList);
 
-  // convert std::vector of std::vectors of unsigned ints into matrix of ints
+  // get the per process max instance allocations per resource
   unsigned int **maxes;
   maxes = new unsigned int*[numOfProcesses];
   for (unsigned int i = 0; i < numOfProcesses; i++) {
@@ -142,16 +146,21 @@ State initState(const std::vector<std::string> &instructions) {
     for (unsigned int j = 0; j < numOfResources; j++) {
       maxes[i][j] = std::stoi(trim(splitStr[j]));
     }
-    // pop instructionList until nonEmpty line is displayed
     popInstructionListUntilNonEmptyLine(line, instructionList);
   }
 
-  // pop instructionList until nonEmpty line is displayed
-  popInstructionListUntilNonEmptyLine(line, instructionList);
-
   // Fetch process per process data and put it straight into initProcessState
+  ProcessState *pStates = new ProcessState[numOfProcesses];
   for (unsigned int i = 0; i < numOfProcesses; i++) {
+    std::list<std::string> processInfo;
+    do {
+      processInfo.push_back(line);
+      popInstructionListUntilNonEmptyLine(line, instructionList);
+    } while(line.find("end") == std::string::npos);
+    processInfo.push_back(line);
+    popInstructionListUntilNonEmptyLine(line, instructionList);
 
+    pStates[i] = initProcessState(processInfo);
   }
   // init state struct
   State state = {
