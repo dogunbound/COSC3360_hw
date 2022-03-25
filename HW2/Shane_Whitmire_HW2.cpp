@@ -8,9 +8,7 @@
 
 
 namespace helperFunctions {
-  std::string trim(const std::string &s)
-  {
-    if (s.empty()) return s;
+  std::string trim(const std::string &s) {
     std::string::const_iterator it = s.begin();
     while (it != s.end() && isspace(*it))
       it++;
@@ -156,7 +154,7 @@ State initState(const std::vector<std::string> &instructions) {
     do {
       processInfo.push_back(line);
       popInstructionListUntilNonEmptyLine(line, instructionList);
-    } while(line.find("end") == std::string::npos);
+    } while(line.find("end") == std::string::npos && instructionList.size() != 0);
     processInfo.push_back(line);
     popInstructionListUntilNonEmptyLine(line, instructionList);
 
