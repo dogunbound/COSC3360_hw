@@ -109,11 +109,7 @@ shmdt(bank_account);
 shmctl(shmid,0,IPC_RMID);
 semctl(sid,0,IPC_RMID);
 /* use these if you don't use the above commands to remove semaphores and shared memory courtesy of pavan
-ipcs -q | awk '{ print "ipcrm -q "$2}' | sh > /dev/null 2>&1;
-
-ipcs -m | awk '{ print "ipcrm -m "$2}' | sh > /dev/null 2>&1;
-
-ipcs -s | awk '{ print "ipcrm -s "$2}' | sh > /dev/null 2>&1;
+ipcs -q | awk '{ print "ipcrm -q "$2}' | sh > /dev/null 2>&1; ipcs -m | awk '{ print "ipcrm -m "$2}' | sh > /dev/null 2>&1; ipcs -s | awk '{ print "ipcrm -s "$2}' | sh > /dev/null 2>&1;
 */
 return 0;
 }
