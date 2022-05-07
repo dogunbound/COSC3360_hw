@@ -79,7 +79,7 @@ switch(pnum)
 	cout<< "critical section 0 start"<<endl;
 	semop(sid,&sb[0],1);//wait entering critical section of accessing bank_account
 	cout<< "critical section 0 in"<<endl;
-	//sleep(10);
+	sleep(10);
 	*bank_account = *bank_account + 3;
 	semop(sid,&sb[1],1);
 	cout<< "critical section 0 end"<<endl;
@@ -91,7 +91,7 @@ switch(pnum)
 	case(1):
 	sb[0].sem_num = 0;
 	sb[1].sem_num = 0;
-	//sleep(2);
+	sleep(2);
 	cout<< "critical section 1 start"<<endl;
 	semop(sid,&sb[0],1);//wait entering critical section of accessing bank_account
 	cout<< "critical section 1 in"<<endl;
